@@ -137,7 +137,7 @@ export const returnOrder = tool({
 });
 
 export const getProductDetails = tool({
-	description: `Returns the product full details (description, price, image, sizes, stock), Use this when a user asks for the details of a specific product.`,
+	description: `Returns the product full details (description, price, image, sizes, stock). Use this when a user asks for the details of a specific product.`,
 	inputSchema: z.object({
 		productId: z.string().describe("The ID of the product to get the details"),
 	}),
@@ -146,7 +146,7 @@ export const getProductDetails = tool({
 
 		try {
 			const productDetails = await getProductById(productId);
-			console.log("productDetails", productDetails);
+
 			return productDetails;
 		} catch (err) {
 			const message =
