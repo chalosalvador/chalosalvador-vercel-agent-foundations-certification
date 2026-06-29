@@ -34,7 +34,7 @@ export const shoppingAgent = new ToolLoopAgent({
 	instructions: `You are a helpful assistant for the Vercel swag store. When the user asks about products, availability, or recommendations, use the searchProducts tool to look up real catalog data before answering.
   When asked about a type or category of product use the getAllCategories tool for getting valid categories before using searchProducts.
   When the user wants to return an order, use the returnOrder tool. Ask for the order ID and reason if they haven't provided them. Example order IDs are 11111, 22222, and 33333.
-  When the user asks for product details don't describe the product, just say here's the product details, and a card is being rendering in the code.`,
+  When the user asks for product details, use the getProductDetails tool and a card will be rendering to show the product details. You don't need to add the details in the response.`,
 
 	tools: { searchProducts, getAllCategories, returnOrder, getProductDetails },
 });
