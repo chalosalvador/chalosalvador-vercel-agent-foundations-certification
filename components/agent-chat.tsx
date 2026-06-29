@@ -12,47 +12,76 @@
  */
 import { useState } from "react";
 import {
-  Conversation,
-  ConversationContent,
-  ConversationScrollButton,
+	Conversation,
+	ConversationContent,
+	ConversationScrollButton,
 } from "@/components/ai-elements/conversation";
 import {
-  PromptInput,
-  PromptInputBody,
-  PromptInputFooter,
-  type PromptInputMessage,
-  PromptInputSubmit,
-  PromptInputTextarea,
-  PromptInputTools,
+	PromptInput,
+	PromptInputBody,
+	PromptInputFooter,
+	type PromptInputMessage,
+	PromptInputSubmit,
+	PromptInputTextarea,
+	PromptInputTools,
 } from "@/components/ai-elements/prompt-input";
+import { useChat } from "@ai-sdk/react";
+import {
+	Message,
+	MessageContent,
+	MessageResponse,
+} from "./ai-elements/message";
 
 export function AgentChat() {
-  const [input, setInput] = useState("");
+	const [input, setInput] = useState("");
+	const { messages, error, sendMessage } = useChat();
 
-  const handleSubmit = (message: PromptInputMessage) => {};
+	const handleSubmit = (message: PromptInputMessage) => {
+		sendMessage({ text: input });
+		setInput("");
+	};
 
-  return (
-    <div className="flex h-full min-h-0 flex-col">
-      <Conversation className="flex-1">
-        <ConversationContent>{null}</ConversationContent>
-        <ConversationScrollButton />
-      </Conversation>
+	if (error) return <div>{error.message}</div>;
 
-      <div className="border-t p-3">
-        <PromptInput onSubmit={handleSubmit}>
-          <PromptInputBody>
-            <PromptInputTextarea
-              value={input}
-              onChange={(e) => setInput(e.currentTarget.value)}
-              placeholder="Ask the agent"
-            />
-          </PromptInputBody>
-          <PromptInputFooter>
-            <PromptInputTools />
-            <PromptInputSubmit status="ready" disabled={!input.trim()} />
-          </PromptInputFooter>
-        </PromptInput>
-      </div>
-    </div>
-  );
+	return (
+		<div className="flex h-full min-h-0 flex-col">
+			<Conversation className="flex-1">
+				<ConversationContent>
+					{messages.map((m) =>
+						m.parts.map((p, i) => {
+							switch (p.type) {
+								case "text":
+									return (
+										<Message key={`${m.id}-${i}`} from={m.role}>
+											<MessageContent>
+												<MessageResponse>{p.text}</MessageResponse>
+											</MessageContent>
+										</Message>
+									);
+								default:
+									return null;
+							}
+						}),
+					)}
+				</ConversationContent>
+				<ConversationScrollButton />
+			</Conversation>
+
+			<div className="border-t p-3">
+				<PromptInput onSubmit={handleSubmit}>
+					<PromptInputBody>
+						<PromptInputTextarea
+							value={input}
+							onChange={(e) => setInput(e.currentTarget.value)}
+							placeholder="Ask the agent"
+						/>
+					</PromptInputBody>
+					<PromptInputFooter>
+						<PromptInputTools />
+						<PromptInputSubmit status="ready" disabled={!input.trim()} />
+					</PromptInputFooter>
+				</PromptInput>
+			</div>
+		</div>
+	);
 }
