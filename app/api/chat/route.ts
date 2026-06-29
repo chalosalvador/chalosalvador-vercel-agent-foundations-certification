@@ -8,14 +8,15 @@
  *
  * Workshop docs: https://agent-foundations-certification.vercel.app/docs/chat-agent
  */
+import { chatFlow } from "@/lib/workflows/chat-flow";
+import type { UIMessage } from "ai";
+import { createUIMessageStreamResponse } from "ai";
+import { start } from "workflow/api";
 
-import { createAgentUIStreamResponse } from "ai";
-import { shoppingAgent } from "@/lib/agent";
-
-export const POST = async (req: Request) => {
-	const { messages } = await req.json();
-	return createAgentUIStreamResponse({
-		agent: shoppingAgent,
-		uiMessages: messages,
+export async function POST(req: Request) {
+	const { messages }: { messages: UIMessage[] } = await req.json();
+	const run = await start(chatFlow, [messages]);
+	return createUIMessageStreamResponse({
+		stream: run.readable,
 	});
-};
+}
