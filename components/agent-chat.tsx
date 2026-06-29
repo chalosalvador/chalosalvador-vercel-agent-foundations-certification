@@ -76,10 +76,16 @@ export function AgentChat() {
 		<div className="flex h-full min-h-0 flex-col">
 			<Conversation className="flex-1">
 				<ConversationContent>
-					{messages.map((m) =>
-						m.parts.map((p, i) => {
+					{messages.map((m) => {
+						const hasProductDetails = m.parts.some(
+							(p) => p.type === "tool-getProductDetails",
+						);
+						return m.parts.map((p, i) => {
 							switch (p.type) {
 								case "text":
+									// When a product-details card is rendered, suppress any
+									// trailing model text so the card stands on its own.
+									if (hasProductDetails) return null;
 									return (
 										<Message key={`${m.id}-${i}`} from={m.role}>
 											<MessageContent>
@@ -98,8 +104,8 @@ export function AgentChat() {
 								default:
 									return null;
 							}
-						}),
-					)}
+						});
+					})}
 				</ConversationContent>
 				<ConversationScrollButton />
 			</Conversation>
