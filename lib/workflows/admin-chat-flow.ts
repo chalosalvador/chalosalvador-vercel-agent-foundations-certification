@@ -40,9 +40,12 @@ export async function readMemories() {
 	return buffer ? new TextDecoder().decode(buffer) : null;
 }
 
-export async function adminChatFlow(messages: ModelMessage[]) {
+export async function adminChatFlow(messages: UIMessage[]) {
 	"use workflow";
 	const memories = await readMemories();
+
+	const modelMessages = await convertToModelMessages(messages);
+
 	const agent = new DurableAgent({
 		model: "anthropic/claude-sonnet-4.6",
 		instructions: [
@@ -89,7 +92,7 @@ export async function adminChatFlow(messages: ModelMessage[]) {
 		},
 	});
 	await agent.stream({
-		messages,
+		messages: modelMessages,
 		writable: getWritable<UIMessageChunk>(),
 	});
 }
